@@ -1,0 +1,3 @@
+@import-normalize;
+@import "./components//General/Normilize.css";
+@import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
