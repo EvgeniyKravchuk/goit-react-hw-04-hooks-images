@@ -1,31 +1,29 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Backdrop, Image } from "./Modal.styled";
 
 const modalPortal = document.querySelector("#modal-root");
 
-export default class Modal extends Component {
-  ref = React.createRef();
+export default function Modal({ url, closeModal }) {
+  useEffect(() => {
+    const backdropRef = document.querySelector(".backdrop");
 
-  componentDidMount() {
-    this.ref.current.addEventListener("click", this.props.closeModal);
-    window.addEventListener("keydown", this.props.closeModal);
-  }
+    backdropRef.addEventListener("click", closeModal);
+    window.addEventListener("keydown", closeModal);
 
-  componentWillUnmount() {
-    this.ref.current.removeEventListener("click", this.props.closeModal);
-    window.removeEventListener("keydown", this.props.closeModal);
-  }
+    return () => {
+      backdropRef.removeEventListener("click", closeModal);
+      window.removeEventListener("keydown", closeModal);
+    };
+  });
 
-  render() {
-    return createPortal(
-      <Backdrop ref={this.ref}>
-        <Image src={this.props.url} alt="" />
-      </Backdrop>,
-      modalPortal
-    );
-  }
+  return createPortal(
+    <Backdrop className="backdrop">
+      <Image src={url} alt="" />
+    </Backdrop>,
+    modalPortal
+  );
 }
 
 Modal.propTypes = {

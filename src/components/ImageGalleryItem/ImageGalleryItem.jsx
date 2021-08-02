@@ -1,48 +1,47 @@
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import { useState, useEffect } from "react";
 import { Item, Image } from "./ImageGalleryItem.styled";
 
-export default class ImageGalleryItem extends Component {
-  state = {
-    response: [],
-    error: null,
-  };
+export default function ImageGalleryItem({
+  search,
+  page,
+  setPage,
+  scroll,
+  hideLoader,
+  openModal,
+}) {
+  const [response, setRespone] = useState([]);
 
-  componentDidMount() {
+  useEffect(() => {
     const list = document.querySelector("ul");
-    const { openModal } = this.props;
 
-    this.fetchImagesByName();
+    // fetchImagesByName();
 
     list.addEventListener("click", openModal);
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { search, page, scroll } = this.props;
+    return () => {
+      list.removeEventListener("click", openModal);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    if (prevProps.search !== search) {
-      this.setState({
-        response: [],
-      });
+  useEffect(() => {
+    setRespone([]);
+    setPage(1);
+    fetchImagesByName();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
 
-      this.fetchImagesByName();
+  useEffect(() => {
+    if (page < 2) {
+      return;
     }
+    fetchImagesByName().then(scroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
 
-    if (prevProps.page !== page) {
-      this.fetchImagesByName().then(scroll);
-    }
-  }
-
-  componentWillUnmount() {
-    const list = document.querySelector("ul");
-    const { openModal } = this.props;
-
-    list.removeEventListener("click", openModal);
-  }
-
-  fetchImagesByName = () => {
+  const fetchImagesByName = () => {
     const API_KEY = "22542197-803b3827949c8e03dddadbe4d";
-    const { search, page } = this.props;
     const errorMessage = `Изображений по ключевому слову ${search} не найдено`;
 
     return fetch(
@@ -55,27 +54,23 @@ export default class ImageGalleryItem extends Component {
         if (data.hits.length === 0) {
           return Promise.reject(new Error(errorMessage));
         }
-        return this.setState((prevState) => ({
-          response: [...prevState.response, ...data.hits],
-        }));
+        return setRespone((response) => [...response, ...data.hits]);
       })
       .catch((error) => alert(error.message))
       .finally(() => {
-        this.props.hideLoader();
+        hideLoader();
       });
   };
 
-  render() {
-    return this.state.response.map((item) => {
-      const { id, webformatURL, tags, largeImageURL } = item;
+  return response.map((item) => {
+    const { id, webformatURL, tags, largeImageURL } = item;
 
-      return (
-        <Item key={id}>
-          <Image src={webformatURL} alt={tags} data-big_image={largeImageURL} />
-        </Item>
-      );
-    });
-  }
+    return (
+      <Item key={id}>
+        <Image src={webformatURL} alt={tags} data-big_image={largeImageURL} />
+      </Item>
+    );
+  });
 }
 
 ImageGalleryItem.propTypes = {
