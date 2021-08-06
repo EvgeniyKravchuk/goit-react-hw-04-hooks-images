@@ -39,13 +39,13 @@ export default function ImageGallery({ search, hideLoader }) {
             openModal={(evt) => openModal(evt)}
             hideLoader={hideLoader}
             search={search}
-            page={page}
             setPage={setPage}
+            page={page}
             scroll={scroll}
           />
         </List>
       </Section>
-      <LoadMoreButton onClick={() => setPage((page) => page + 1)} />{" "}
+      <LoadMoreButton onClick={() => setPage((page) => page + 1)} />
       {modalIsOpen && (
         <Modal url={modalUrl} closeModal={(evt) => closeModal(evt)} />
       )}
